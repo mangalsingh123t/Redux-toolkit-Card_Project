@@ -1,61 +1,46 @@
-
-import { useDispatch } from 'react-redux'
-import { incremenCardItemCount } from '../features/cardItem/itemSlice'
+import { useDispatch } from 'react-redux';
+import { incremenCardItemCount } from '../features/cardItem/itemSlice';
+import { useGetProductByIdQuery } from '../services/Product';
 
 export default function CardCom() {
+    const { data, error, isLoading } = useGetProductByIdQuery([]);
+    const dispatch = useDispatch();
 
-    const dispatch = useDispatch()
-    console.log(dispatch)
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (error) {
+        return <div>Error loading product</div>;
+    }
 
     return (
         <>
-            <div className="countainer-fluid">
-                <div className="row justify-content-evenly pt-5">
-                    <div className="col-md-2">
-                        <div className="card" style={{ width: "200px" }}>
-                            {/* <img src="..." className="card-img-top" alt="..." /> */}
-                            <div className="card-body">
-                                <h5 className="card-title">Product 1</h5>
-                                <p className="card-text">Some quick example text to build on the card title and make up the bulk of the  content.</p>
-                                <button className="btn btn-primary" onClick={() => dispatch(incremenCardItemCount())}>ADD TO CART</button>
-
+         {data && (
+    <div className="container mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-5 ">
+            {data.map((item, index) => (
+                <div key={index} className="p-2">
+                    <div className="card bg-white shadow-lg rounded-lg">
+                        <div className="p-4">
+                            <h5 className="text-lg font-bold">{item.title}</h5>
+                            <p className="text-sm text-gray-600">{item.description.slice(0, 150)}</p>
+                            <div className='text-center'>
+                            <button
+                                className="btn btn-primary mt-3 bg-blue-500 text-white px-4 py-2 rounded"
+                                onClick={() => dispatch(incremenCardItemCount(item.id))}
+                            >
+                                ADD TO CART
+                            </button>
                             </div>
                         </div>
-                    </div>
-                    <div className="col-md-2">
-                        <div className="card" style={{ width: "200px" }}>
-                            {/* <img src="..." className="card-img-top" alt="..." /> */}
-                            <div className="card-body">
-                                <h5 className="card-title">Product 2</h5>
-                                <p className="card-text">Some quick example text to build on the card title and make up the bulk of the  content.</p>
-                                <button className="btn btn-primary" onClick={() => dispatch(incremenCardItemCount())}>ADD TO CART</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="col-md-2">
-                        <div className="card" style={{ width: "200px" }}>
-                            {/* <img src="..." className="card-img-top" alt="..." /> */}
-                            <div className="card-body">
-                                <h5 className="card-title">Product 3</h5>
-                                <p className="card-text">Some quick example text to build on the card title and make up the bulk of the  content.</p>
-                                <button className="btn btn-primary" onClick={() => dispatch(incremenCardItemCount())}>ADD TO CART</button>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div className="col-md-2">
-                        <div className="card" style={{ width: "200px" }}>
-                            {/* <img src="..." className="card-img-top" alt="..." /> */}
-                            <div className="card-body">
-                                <h5 className="card-title">Product 4</h5>
-                                <p className="card-text">Some quick example text to build on the card title and make up the bulk of the  content.</p>
-                                <button className="btn btn-primary" onClick={() => dispatch(incremenCardItemCount())}>ADD TO CART</button>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
-            </div>
+            ))}
+        </div>
+    </div>
+)}
+
         </>
-    )
+    );
 }

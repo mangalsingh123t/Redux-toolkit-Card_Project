@@ -4,10 +4,14 @@ export const productApi = createApi({
   reducerPath: 'productApi',
   baseQuery: fetchBaseQuery({ baseUrl: 'https://fakestoreapi.com/' }),
   endpoints: (builder) => ({
-    getProductById: builder.query({
+    getAllProducts: builder.query({
+      query: () => `products`,
+    }),
+    getProductsById: builder.query({
       query: (id) => `products/${id}`,
     }),
+
   }),
 })
 
-export  const { useGetProductByIdQuery } = productApi
+export  const { useGetAllProductsQuery ,useGetProductsByIdQuery} = productApi

@@ -1,6 +1,7 @@
+/* eslint-disable no-undef */
 import { useDispatch } from 'react-redux';
 import { incremenCardItemCount } from '../features/cardItem/itemSlice';
-import { useGetAllProductsQuery, useGetProductsByIdQuery } from '../services/Product';
+import { useGetAllProductsQuery, useGetProductsByIdQuery,useDeleteDataByIdMutation } from '../services/Product';
 import Loding from './loding/Loding';
 import { useRef, useState } from 'react';
 
@@ -14,14 +15,30 @@ export default function CardCom() {
 
     const { data: allData, error: allError, isLoading: isLoadingAll } = useGetAllProductsQuery();
     const { data, error, isLoading } = useGetProductsByIdQuery(id, { skip: id === null });
-
+    const [deleteDataById, { isLoading: isDeleting, error: deleteError }] = useDeleteDataByIdMutation();
     const dispatch = useDispatch();
 
+    async function deleteCard(itemId) {
+        try {
+            await deleteDataById(itemId).unwrap();
+            // refetchAll(); // Refetch the products after deletion
+            console.log(`Product with ID ${itemId} deleted successfully`);
+        } catch (err) {
+            console.error('Failed to delete the product: ', err);
+        }
+    }
     if (isLoadingAll) {
         return <div className='flex place-content-center items-center h-[500px]'><Loding /></div>;
     }
 
     if (allError) {
+        return <div>Error loading products</div>;
+    }
+    if (isDeleting) {
+        return <div className='flex place-content-center items-center h-[500px]'><Loding /></div>;
+    }
+
+    if (deleteError) {
         return <div>Error loading products</div>;
     }
 
@@ -51,6 +68,12 @@ export default function CardCom() {
                                                 onClick={() => dispatch(incremenCardItemCount())}
                                             >
                                                 ADD TO CART
+                                            </button>
+                                            <button
+                                                className="btn btn-primary mt-3 bg-red-500 text-white px-14 py-2 rounded"
+                                                onClick={()=>deleteCard(item.id)}
+                                            >
+                                                DELETE
                                             </button>
                                         </div>
                                     </div>

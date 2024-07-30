@@ -17,10 +17,16 @@ export const productApi = createApi({
           method:"DELETE"
         }
       }
-
+    }),
+    createCardData:builder.mutation({
+        query: (newData) => ({
+          url: 'products',
+          method: 'POST',
+          body: newData,
+        }),
     })
 
   }),
 })
 
-export  const { useGetAllProductsQuery ,useGetProductsByIdQuery ,useDeleteDataByIdMutation} = productApi
+export  const { useGetAllProductsQuery ,useGetProductsByIdQuery ,useDeleteDataByIdMutation ,useCreateCardDataMutation} = productApi

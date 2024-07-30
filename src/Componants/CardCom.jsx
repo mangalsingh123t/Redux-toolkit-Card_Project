@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 import { useDispatch } from 'react-redux';
 import { incremenCardItemCount } from '../features/cardItem/itemSlice';
-import { useGetAllProductsQuery, useGetProductsByIdQuery,useDeleteDataByIdMutation } from '../services/Product';
+import { useGetAllProductsQuery, useGetProductsByIdQuery, useDeleteDataByIdMutation, useCreateCardDataMutation } from '../services/Product';
 import Loding from './loding/Loding';
 import { useRef, useState } from 'react';
 
@@ -17,6 +17,11 @@ export default function CardCom() {
     const { data, error, isLoading } = useGetProductsByIdQuery(id, { skip: id === null });
     const [deleteDataById, { isLoading: isDeleting, error: deleteError }] = useDeleteDataByIdMutation();
     const dispatch = useDispatch();
+    const [createData] = useCreateCardDataMutation()
+    const[title,setTitle]  = useState(null)
+    const[description,setDescription]  = useState(null)
+    const inputTitle=useRef()
+    const inputDescription=useRef()
 
     async function deleteCard(itemId) {
         try {
@@ -27,6 +32,25 @@ export default function CardCom() {
             console.error('Failed to delete the product: ', err);
         }
     }
+
+    const handleTitleBlur = () => {
+        setTitle(inputTitle.current.value);
+      };
+    
+      const handleDescriptionBlur = () => {
+        setDescription(inputDescription.current.value);
+      };
+
+    async function insertData(title,description) {
+        try {
+            await createData({title,description});
+            console.log(`Product Data Create Duccessfully`);
+        } catch (err) {
+            console.error('Failed to Create product: ', err);
+        }
+    }
+
+  
     if (isLoadingAll) {
         return <div className='flex place-content-center items-center h-[500px]'><Loding /></div>;
     }
@@ -48,6 +72,11 @@ export default function CardCom() {
                 <input type="text " className='p-1 ps-1' placeholder='Search product by id' ref={product_id} />
                 <button className='bg-blue-500 p-1' onClick={searchhandler}>Search</button>
             </div>
+            <div className='text-center mt-2'>
+                <div><input type="text " placeholder='Add title for Card' ref={inputTitle}  onBlur={handleTitleBlur}/></div>
+                <div><input type="text " placeholder='Add Description for Card' ref={inputDescription}  onBlur={handleDescriptionBlur}/></div>
+                <button className='py-1 px-3 bg-blue-500 text-white' onClick={()=>insertData(title,description)}>Create CardData</button>
+            </div>
 
             {isLoading && <div className='flex place-content-center items-center h-[500px]'><Loding /></div>}
 
@@ -55,7 +84,7 @@ export default function CardCom() {
 
             {id === null && allData && (
                 <div className="container mx-auto">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-3">
                         {allData.map((item) => (
                             <div key={item.id} className="p-2">
                                 <div className="card bg-white shadow-lg rounded-lg h-full">
@@ -71,7 +100,7 @@ export default function CardCom() {
                                             </button>
                                             <button
                                                 className="btn btn-primary mt-3 bg-red-500 text-white px-14 py-2 rounded"
-                                                onClick={()=>deleteCard(item.id)}
+                                                onClick={() => deleteCard(item.id)}
                                             >
                                                 DELETE
                                             </button>

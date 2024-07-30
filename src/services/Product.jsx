@@ -24,9 +24,16 @@ export const productApi = createApi({
           method: 'POST',
           body: newData,
         }),
-    })
+    }),
+    updateCardData:builder.mutation({
+      query: ({ id, ...newData }) => ({
+        url: `products/${id}`,
+        method: 'PUT',
+        body: newData,
+      }),
+  })
 
   }),
 })
 
-export  const { useGetAllProductsQuery ,useGetProductsByIdQuery ,useDeleteDataByIdMutation ,useCreateCardDataMutation} = productApi
+export  const { useGetAllProductsQuery ,useGetProductsByIdQuery ,useDeleteDataByIdMutation ,useCreateCardDataMutation ,useUpdateCardDataMutation} = productApi

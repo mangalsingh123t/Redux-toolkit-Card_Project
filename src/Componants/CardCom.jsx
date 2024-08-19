@@ -4,7 +4,7 @@ import { incremenCardItemCount } from '../features/cardItem/itemSlice';
 import { useGetAllProductsQuery, useGetProductsByIdQuery, useDeleteDataByIdMutation, useCreateCardDataMutation } from '../services/Product';
 import Loding from './loding/Loding';
 import { useRef, useState } from 'react';
-
+import logger from './logger/Logger'
 export default function CardCom() {
     const product_id = useRef();
     const [id, setId] = useState(null);
@@ -27,8 +27,10 @@ export default function CardCom() {
         try {
             await deleteDataById(itemId).unwrap();
             // refetchAll(); // Refetch the products after deletion
+            logger.info("Product with ID ${itemId} deleted successfully");   
             console.log(`Product with ID ${itemId} deleted successfully`);
         } catch (err) {
+            logger.error('Failed to delete the product: ', err);
             console.error('Failed to delete the product: ', err);
         }
     }

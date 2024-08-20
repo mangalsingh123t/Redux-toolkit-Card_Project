@@ -8,12 +8,11 @@ import logger from './logger/Logger'
 export default function CardCom() {
     const product_id = useRef();
     const [id, setId] = useState(null);
-
     const searchhandler = () => {
         setId(product_id.current.value);
     };
 
-    const { data: allData, error: allError, isLoading: isLoadingAll } = useGetAllProductsQuery();
+    const { data: allData, error: allError, isLoading: isLoadingAll ,refetch } = useGetAllProductsQuery();
     const { data, error, isLoading } = useGetProductsByIdQuery(id, { skip: id === null });
     const [deleteDataById, { isLoading: isDeleting, error: deleteError }] = useDeleteDataByIdMutation();
     const dispatch = useDispatch();
@@ -47,11 +46,26 @@ export default function CardCom() {
         try {
             await createData({title,description});
             console.log(`Product Data Create Duccessfully`);
+              // Clear the input fields
+              inputTitle.current.value = '';
+              inputDescription.current.value = '';
         } catch (err) {
             console.error('Failed to Create product: ', err);
         }
     }
 
+
+    function getAllCards() {
+        refetch().then((result) => {
+            if (result.error) {
+                console.error('Refetch error:', result.error);
+            } else {
+                console.log('Refetch successful:', result.data);
+                setId(null); // Reset the id state to ensure all data is displayed
+            }
+        });
+    }
+    
   
     if (isLoadingAll) {
         return <div className='flex place-content-center items-center h-[500px]'><Loding /></div>;
@@ -78,6 +92,9 @@ export default function CardCom() {
                 <div><input type="text " placeholder='Add title for Card' ref={inputTitle}  onBlur={handleTitleBlur}/></div>
                 <div><input type="text " placeholder='Add Description for Card' ref={inputDescription}  onBlur={handleDescriptionBlur}/></div>
                 <button className='py-1 px-3 bg-blue-500 text-white' onClick={()=>insertData(title,description)}>Create CardData</button>
+            </div>
+            <div className='text-center mt-2'>
+                <button className='py-1 px-3 bg-blue-500 text-white' onClick={getAllCards}>Get AllCards</button>
             </div>
 
             {isLoading && <div className='flex place-content-center items-center h-[500px]'><Loding /></div>}
